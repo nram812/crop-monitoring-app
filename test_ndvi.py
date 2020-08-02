@@ -15,7 +15,8 @@ import pandas as pd
 
 import numpy as np
 
-
+import os
+#os.chdir(r'C:\Users\rampaln\OneDrive - NIWA\Research Projects\Test_crop_app\crop-monitoring-app')
 df1 = xr.open_dataset(r'MODIS_netcdf.nc')
 #observations = df['CMG 0.05 Deg Monthly NDVI']
 
@@ -52,7 +53,7 @@ app.layout = html.Div(style={'backgroundColor': colors['background'],'body':0},
                                          dcc.Dropdown(
                                              id='datetimemonth-dropdown',
                                              options=[{'label': k, 'value': k} for k in list(df1.variables)],
-                                             value=list(df1.variables)[-2],
+                                             value='CMG 0.05 Deg Monthly EVI',
                                              placeholder="Select Variable",
                                              style=dict(width='40%',
                                                  display='inline-block',
