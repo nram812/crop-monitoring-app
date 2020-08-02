@@ -1,1 +1,1 @@
-web: gunicorn test_netcdf_final:server
+web: gunicorn test_ndvi:server
