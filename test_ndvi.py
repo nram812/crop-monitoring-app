@@ -125,7 +125,7 @@ def update_graph(filename, slider_time):
         'layout':
             go.Layout(autosize=True, hovermode='closest',
                       title='Average {} on {}'.format(filename.strip("CMG").strip("DEG").strip("Monthly"),time_str),
-                      barmode='stack', mapbox=mapbox, height=500, width=500,template= 'seaborn', font=dict(
+                      barmode='stack', mapbox=mapbox, height=700, width=700,template= 'seaborn', font=dict(
                 family="Courier New, monospace",
                 size=10,
             ))
