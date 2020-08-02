@@ -25,9 +25,9 @@ colors = {
     'background': '#111111',
     'text': '#7FDBFF'
 }
-
+server = flask.Flask(__name__)
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets, server = server)
 #app.config.suppress_callback_exceptions = True
 #,
 
