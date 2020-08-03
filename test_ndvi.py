@@ -59,6 +59,7 @@ app.layout = html.Div(style={'backgroundColor': colors['background'],'body':0},
                                              style=dict(width='40%',
                                                  display='inline-block',
                                                  verticalAlign="middle")),
+                                        dcc.Interval(interval=500),
                                         dcc.Slider(id ="time-slider",min=0, #the first date
                                                        max=len(times)-1, #the last date
                                                        value=0,
@@ -75,7 +76,7 @@ app.layout = html.Div(style={'backgroundColor': colors['background'],'body':0},
                                  html.P('',style={'color': 'k'}),
                                  html.P('',style={'color': 'k'}),
                                  dcc.Interval(interval=1*100),
-                                 dcc.Graph(id ='funnel-graph2'),
+                                 dcc.Graph(id ='funnel-graph2', animate =True),
                                  dcc.Interval(interval=1*100)
                              ])
                               ])
@@ -104,7 +105,7 @@ def update_graph(filename, slider_time):
     trace1 = go.Scattermapbox(lat=lats2,
                               lon=lons2,
                               mode='markers+text',
-                              marker=dict(size=7, showscale=True, color=vals2, colorscale ='rdylgn',cmin=-0.3, cmax=0.8),
+                              marker=dict(size=7, showscale=True, color=vals2, colorscale ='rdylgn',cmin=0.01, cmax=0.8),
                               textposition='top right',
                               hovertext=[f"{filename} %.2f" % i for i in vals2])
     mapbox = dict(
@@ -170,17 +171,17 @@ def update_pre_callback(filename, foo_click_data,time_slider):
     xdata2 = df2.loc[time_value]
     # df2 = df.groupby(df.time.dt.month).apply(demean)
     # df2 = df2.to_dataframe()
-    trace3 = go.Scatter(x = index, y = [xdata[filename]], mode ='markers+text',name = 'NDVI',marker=dict(size=14, color='blue'))
-    trace1 = go.Scatter(x=df.index, y=df[filename], name =f'{filename} time-series', mode ='lines', textposition = 'bottom center')
-    trace2 = go.Scatter(x=df2.index, y=df2[filename], name =f'{filename} deseasonalised anomally series', mode='lines', textposition = 'bottom center')
+    trace3 = go.Scatter(x = index, y = [xdata[filename]], mode ='markers+text',name = 'EVI',marker=dict(size=14, color='blue'))
+    trace1 = go.Scatter(x=df.index, y=df[filename], name =f'EVI', mode ='lines', textposition = 'bottom center')
+    trace2 = go.Scatter(x=df2.index, y=df2[filename], name =f'EVI Anomally', mode='lines', textposition = 'bottom center')
     trace4 = go.Scatter(x=index, y=[xdata2[filename]], mode='markers+text',
-                        marker=dict(size=14, color='red'),name = 'NDVI Anomally')
+                        marker=dict(size=14, color='red'),name = 'EVI Anomally')
 
     return {
         'data': [trace1, trace2,trace3,trace4],
         'layout':
         go.Layout(
-            title='{} Time-Series Lat:{} Lon:{}'.format(filename,"%.2f" % lats,"%.2f" % lons),
+            title='{} Time-Series'.format(filename),#,"%.2f" % lats,"%.2f" % lons),
             barmode='stack', width = 900, height =600,# colorway=["#5E0DAC", '#FF4F00', '#375CB1', '#FF7400', '#FFF400', '#FF0056'],
             template='plotly_white',
             hovermode='x',
