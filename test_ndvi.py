@@ -47,6 +47,7 @@ app.layout = html.Div(style={'backgroundColor': colors['background'],'body':0},
                     html.Div(className='six columns',
                              children=[
                                  html.H2('MODIS Satellite Crop Monitoring Tool',style={'color': 'k'}),
+                                 dcc.Interval(interval=500),
                                  html.P('Click on a Location to plot the time-series',style={'color': 'k'}),
                                  html.Div(
                                      className='div-for-dropdown',
@@ -59,11 +60,16 @@ app.layout = html.Div(style={'backgroundColor': colors['background'],'body':0},
                                              style=dict(width='40%',
                                                  display='inline-block',
                                                  verticalAlign="middle")),
-                                        dcc.Interval(interval=500),
+                                        dcc.Interval(interval=100),
                                         dcc.Slider(id ="time-slider",min=0, #the first date
                                                        max=len(times)-1, #the last date
-                                                       value=0,
+                                                       value=len(times)-3,
                                                    tooltip={'always_visible': True}),
+                                         html.P('Select a Zoom Level', style={'color': 'k'}),
+                                         dcc.Slider(id="zoom-slider", min=3,  # the first date
+                                                    max=10,  # the last date
+                                                    value=4,
+                                                    tooltip={'always_visible': True}),
                                          dcc.Interval(interval=500),
                                          dcc.Graph(id='funnel-graph'),
                                      ],
@@ -85,8 +91,9 @@ app.layout = html.Div(style={'backgroundColor': colors['background'],'body':0},
 
 @app.callback(dash.dependencies.Output('funnel-graph', 'figure'),
               [dash.dependencies.Input('datetimemonth-dropdown', 'value'),
-               dash.dependencies.Input("time-slider", "value")])
-def update_graph(filename, slider_time):
+               dash.dependencies.Input("time-slider", "value"),
+               dash.dependencies.Input("zoom-slider", "value")])
+def update_graph(filename, slider_time, zoom_slider):
     print(slider_time)
     df = df1[filename].isel(time = slider_time)
     time_str = str(pd.to_datetime(df.time.values).date())
@@ -114,8 +121,8 @@ def update_graph(filename, slider_time):
             lon=175
         ),
         pitch=0,
-        zoom=4,
-        style="open-street-map")
+        zoom=zoom_slider,
+        style= "carto-positron")
 
     # trace2 = go.Bar(x=pv.index, y=pv[('Quantity', 'pending')], name='Pending')
     # trace3 = go.Bar(x=pv.index, y=pv[('Quantity', 'presented')], name='Presented')
@@ -126,7 +133,7 @@ def update_graph(filename, slider_time):
         'layout':
             go.Layout(autosize=True, hovermode='closest',
                       title='Average {} on {}'.format(filename.strip("CMG").strip("DEG").strip("Monthly"),time_str),
-                      barmode='stack', mapbox=mapbox, height=700, width=700,template= 'seaborn', font=dict(
+                      barmode='stack', mapbox=mapbox, height=750, width=800,template= 'seaborn', font=dict(
                 family="Courier New, monospace",
                 size=10,
             ))
@@ -139,7 +146,7 @@ def update_graph2(foo_click_data):
     return foo_click_data['points'][0]['lat'], foo_click_data['points'][0]['lon']
 
 def demean(a):
-    return a - a.sel(time = slice("1980","2020")).mean("time")
+    return a - a.sel(time = slice("2002","2020")).mean("time")
 
 
 @app.callback(dash.dependencies.Output('funnel-graph2', 'figure'),
@@ -182,7 +189,7 @@ def update_pre_callback(filename, foo_click_data,time_slider):
         'layout':
         go.Layout(
             title='{} Time-Series'.format(filename),#,"%.2f" % lats,"%.2f" % lons),
-            barmode='stack', width = 900, height =600,# colorway=["#5E0DAC", '#FF4F00', '#375CB1', '#FF7400', '#FFF400', '#FF0056'],
+            barmode='stack', width = 950, height =950,# colorway=["#5E0DAC", '#FF4F00', '#375CB1', '#FF7400', '#FFF400', '#FF0056'],
             template='plotly_white',
             hovermode='x',
             autosize=True,
