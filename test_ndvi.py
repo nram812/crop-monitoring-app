@@ -46,8 +46,9 @@ app.layout = html.Div(style={'backgroundColor': colors['background'],'body':0},
                  children=[
                     html.Div(className='six columns',
                              children=[
-                                 html.H2('MODIS Satellite Crop Monitoring Tool',style={'color': 'k'}),
+                                 html.H2('MODIS Enhanced Vegetation Index (EVI) Explorer',style={'color': 'k'}),
                                  dcc.Interval(interval=500),
+                                 html.P('Refresh the App on Loading (In browser)',style={'color': 'k'})
                                  html.P('Click on a Location to plot the time-series',style={'color': 'k'}),
                                  html.Div(
                                      className='div-for-dropdown',
@@ -60,7 +61,7 @@ app.layout = html.Div(style={'backgroundColor': colors['background'],'body':0},
                                              style=dict(width='40%',
                                                  display='inline-block',
                                                  verticalAlign="middle")),
-                                        dcc.Interval(interval=100),
+                                        dcc.Interval(interval=500),
                                         dcc.Slider(id ="time-slider",min=0, #the first date
                                                        max=len(times)-1, #the last date
                                                        value=len(times)-3,
@@ -70,20 +71,18 @@ app.layout = html.Div(style={'backgroundColor': colors['background'],'body':0},
                                                     max=10,  # the last date
                                                     value=4,
                                                     tooltip={'always_visible': True}),
-                                         dcc.Interval(interval=500),
                                          dcc.Graph(id='funnel-graph'),
+                                         dcc.Interval(interval=1000),
                                      ],
                                      style={'color': 'k'})
                                 ]
                              ),
-                    dcc.Interval(interval=1 * 1),
                     html.Div(className='six columns',
                              children=[html.H2('Time-Series',style={'color': 'k'}),
                                  html.P('',style={'color': 'k'}),
                                  html.P('',style={'color': 'k'}),
-                                 dcc.Interval(interval=1*100),
                                  dcc.Graph(id ='funnel-graph2', animate =True),
-                                 dcc.Interval(interval=1*100)
+                                 dcc.Interval(interval=1*500)
                              ])
                               ])
         ])
