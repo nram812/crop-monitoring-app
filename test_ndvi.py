@@ -15,11 +15,144 @@ import pandas as pd
 
 import numpy as np
 
+
+
+
 import os
-#os.chdir(r'C:\Users\rampaln\OneDrive - NIWA\Research Projects\Test_crop_app\crop-monitoring-app')
+import xarray as xr
+os.chdir(r'C:\Users\rampaln\OneDrive - NIWA\Research Projects\Test_crop_app\crop-monitoring-app')
 df1 = xr.open_dataset(r'MODIS_netcdf.nc')
 df1.load()
+df = df1['CMG 0.05 Deg Monthly EVI'].isel(time =0)
+cs = df1['CMG 0.05 Deg Monthly EVI'].isel(time =0).plot()
+import numpy as np
+
+vals = df.values
+lats = df.latitude.values
+lons = df.longitude.values
+import pylab as py
+lats, lons = np.meshgrid(lats, lons)
+lats = lats.T
+lons = lons.T
+# py.figure()
+# cs = py.contourf(lons, lats, vals, levels = np.arange(-0.1,1, 0.1))
+# py.show()
+
+idx = vals > 0.0
+lats, lons = np.meshgrid(lats, lons)
+lats = lats.T
+lons = lons.T
+vals = vals[idx]
+lats = lats[idx]
+lons = lons[idx]
+import pandas as pd
+import numpy as np
+df = pd.DataFrame({'data':vals,'lat':lats,'lon':lons})
+import json
+import pandas as pd
+from geojson import Feature, FeatureCollection, Point, Polygon
+
+# columns used for constructing geojson object
+features = df.apply(
+    lambda row: Feature(geometry=Point((float(row['lon']), float(row['lat'])))),
+    axis=1).tolist()
+
+# all the other columns used as properties
+properties = df.drop(['lat', 'lon'], axis=1)
+properties['data'] = properties['data'].apply(lambda a: str(a))
+properties = properties.to_dict('records')
+
+# whole geojson object
+feature_collection = FeatureCollection(features=features, properties=properties)
+with open('test.geojson', 'w', encoding='utf-8') as f:
+    json.dump(feature_collection, f, ensure_ascii=False)
+
 #observations = df['CMG 0.05 Deg Monthly NDVI']
+import geojsoncontour
+
+#Converting matplotplib contour plot to geojson
+geojson = geojsoncontour.contourf_to_geojson(
+    contourf=cs,
+    ndigits=4,
+   )
+
+#reading geojson as dict
+price_geojson=eval(geojson)
+# !/usr/bin/env python
+# coding: utf-8
+
+# Creating empty array to fill with prices
+arr_temp = np.ones([len(price_geojson["features"]), 2])
+
+for i in range(0, len(price_geojson["features"])):
+    price_geojson["features"][i]["id"] = i
+
+    # Filling array with price and Id for each geojson spatial object. Z value from contour plot will be stored as title
+    arr_temp[i, 0] = i
+    arr_temp[i, 1] = float(price_geojson["features"][i]["properties"]["title"].split('-')[-1])
+
+# Transforming array to df
+df_contour = pd.DataFrame(arr_temp, columns=["Id", "Price"])
+
+import plotly.graph_objects as go
+
+
+import plotly.express as px
+import geopandas as gpd
+
+gdf = gpd.GeoDataFrame(price_geojson['features'])
+fig = px.choropleth_mapbox(geojson=price_geojson['features'])#, locations=df_contour['Price'].values, color=df_contour['Price'].values,
+                           #color_continuous_scale="Viridis",
+                           #mapbox_style="carto-positron",
+                           #zoom=3, center = {"lat": -37.0902, "lon": 175.7129},
+                           #labels={'Price':'unemployment rate'}
+                          #)
+#f#ig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+plot(fig, filename='name.html')
+
+
+
+# Selecting a central city point to center all graphs around - Swietokrzyska Subway
+center_coors = 52.235176, 21.008393
+
+trace = go.Choroplethmapbox(
+    geojson=price_geojson['features'],
+    z=df_contour.Price,
+    colorscale="jet",
+    marker_line_width=10,
+
+    marker=dict(opacity=0.5)
+)
+
+layout = go.Layout(
+    title="Warsaw Real Estate prices heatmap [PLN/m2]",
+    title_x=0.4,
+    height=800,
+    margin=dict(t=80, b=0, l=0, r=0),
+    font=dict(color='dark grey', size=18),
+
+    mapbox=dict(
+        center=dict(
+            lat=-39,
+            lon=174.5
+        ),
+        zoom=7,
+        style="carto-positron"
+    )
+
+)
+
+figure = dict(
+    data=[trace],
+    layout=layout,
+
+)
+
+from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
+
+plot(figure, filename='name.html')
+
+
 
 server = flask.Flask(__name__)
 colors = {

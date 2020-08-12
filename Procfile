@@ -1,1 +1,1 @@
-web: gunicorn test_ndvi:server
+web: gunicorn test_ndvi_2:server
