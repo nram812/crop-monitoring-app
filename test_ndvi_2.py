@@ -5,6 +5,7 @@ import pandas as pd
 import flask
 import dash
 import os
+import pylab as py
 
 import xarray as xr
 import pandas as pd
@@ -44,7 +45,7 @@ def contour_to_geojson(lats_grid, lons_grid, values, n_levels):
 
 import os
 import xarray as xr
-os.chdir(r'C:\Users\rampaln\OneDrive - NIWA\Research Projects\Test_crop_app\crop-monitoring-app')
+#os.chdir(r'C:\Users\rampaln\OneDrive - NIWA\Research Projects\Test_crop_app\crop-monitoring-app')
 df1 = xr.open_dataset(r'MODIS_netcdf.nc')
 df1.load()
 df = df1['CMG 0.05 Deg Monthly EVI'].isel(time =0)
@@ -68,11 +69,6 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets, server = se
 #         style={'textAlign': 'center',
 #                'verticalAlign': 'middle',
 #
-
-
-
-# Add a command, that enables you to move around with clicking
-# e.g. it has the center coordinates of the map where the last click has occured. 
 times = df1.time.to_index()
 
 app.layout = html.Div(style={'backgroundColor': colors['background'],'body':0},
@@ -134,7 +130,7 @@ def update_graph(filename, slider_time, zoom_slider):
     vals = df.values
     lats = df.latitude.values
     lons = df.longitude.values
-    Ids, geojson = contour_to_geojson(lats, lons, vals, 30)
+    Ids, geojson = contour_to_geojson(lats, lons, vals, 10)
     trace2 = go.Choroplethmapbox(
     geojson=geojson,
     locations=Ids.Id,
@@ -155,10 +151,11 @@ def update_graph(filename, slider_time, zoom_slider):
     lats2 = lats[idx].ravel()
     lons2 = lons[idx].ravel()
     vals2 = vals[idx].ravel()
+    # Note you should only plot these scatter points on the first iteration and then just use them for clicking on the points
     trace1 = go.Scattermapbox(lat=lats2,
                               lon=lons2,
                               mode='markers+text',
-                              marker=dict(size=7, showscale=True, color=vals2, colorscale ='rdylgn',cmin=0.01, cmax=0.8),
+                              marker=dict(size=7, showscale=False, color=vals2, colorscale ='rdylgn',cmin=0.01, cmax=0.8, opacity =0.01),
                               textposition='top right',
                               hovertext=[f"{filename} %.2f" % i for i in vals2])
     mapbox = dict(
@@ -175,7 +172,7 @@ def update_graph(filename, slider_time, zoom_slider):
     # trace4 = go.Bar(x=pv.index, y=pv[('Quantity', 'won')], name='Won')
 
     return {
-        'data': [trace1, trace2],
+        'data': [trace2, trace1],
         'layout':
             go.Layout(autosize=True, hovermode='closest',
                       title='Average {} on {}'.format(filename.strip("CMG").strip("DEG").strip("Monthly"),time_str),
@@ -189,6 +186,8 @@ def update_graph(filename, slider_time, zoom_slider):
 @app.callback(dash.dependencies.Output('funnel-graph', 'value'),
               [dash.dependencies.Input('funnel-graph', 'clickData')])
 def update_graph2(foo_click_data):
+    print(foo_click_data)
+    #foo_click_data = foo_click_data[0]
     return foo_click_data['points'][0]['lat'], foo_click_data['points'][0]['lon']
 
 def demean(a):
