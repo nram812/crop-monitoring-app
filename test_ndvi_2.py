@@ -139,15 +139,15 @@ app.layout = html.Div(style={'backgroundColor': colors['background'],'body':0},
                              ])
                               ])
         ])
-Ids_ = []
-geojsons = []
-for slider_time in range(len(times)):
-    time = times[slider_time]
-    time_str = time.strftime("%Y-%m-%d")
-    Ids_.append(pd.read_csv(f'./assets/Ids_{time_str}.csv', index_col=0))
-    with open(f'./assets/geojson_{time_str}.json', 'r') as f:
-        geojson = json.load(f)
-    geojsons.append(geojson)
+# Ids_ = []
+# geojsons = []
+# for slider_time in range(len(times)):
+#     time = times[slider_time]
+#     time_str = time.strftime("%Y-%m-%d")
+#     Ids_.append(pd.read_csv(f'./assets/Ids_{time_str}.csv', index_col=0))
+#     with open(f'./assets/geojson_{time_str}.json', 'r') as f:
+#         geojson = json.load(f)
+#     geojsons.append(geojson)
 
 @app.callback(dash.dependencies.Output('funnel-graph', 'figure'),
               [dash.dependencies.Input('datetimemonth-dropdown', 'value'),
@@ -156,8 +156,10 @@ for slider_time in range(len(times)):
 def update_graph(filename, slider_time, zoom_slider):
     time = times[slider_time]
     time_str  = time.strftime("%Y-%m-%d")
-    Ids = Ids_[slider_time]#
-    geojson = geojsons[slider_time]
+    with open(f'./assets/geojson_{time_str}.json', 'r') as f:
+        geojson = json.load(f)
+    Ids = pd.read_csv(f'./assets/Ids_{time_str}.csv', index_col=0)
+    #geojson = geojsons[slider_time]
     #pd.read_csv(f'./assets/Ids_{time_str}.csv', index_col=0)
     # with open(f'./assets/geojson_{time_str}.json', 'r') as f:
     #     geojson = json.load(f)
