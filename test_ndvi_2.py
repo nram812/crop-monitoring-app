@@ -6,7 +6,6 @@ import flask
 import dash
 import os
 import pylab as py
-
 import xarray as xr
 import pandas as pd
 import dash
