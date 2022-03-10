@@ -119,7 +119,7 @@ app.layout = html.Div(style={'backgroundColor': colors['background'],'body':0},
                                         dcc.Interval(interval=500),
                                         dcc.Slider(id ="time-slider",min=0, #the first date
                                                        max=len(times)-1, #the last date
-                                                       value=len(times)-3,
+                                                       value=len(times)-3,step =1,
                                                    tooltip={'always_visible': True}, marks=dict1),
                                          html.P('Select a Zoom Level', style={'color': 'k'}),
                                          dcc.Slider(id="zoom-slider", min=3,  # the first date
