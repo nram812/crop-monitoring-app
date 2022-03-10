@@ -178,12 +178,12 @@ def update_graph(filename, slider_time, zoom_slider):
 
     
     lats, lons = np.meshgrid(lats, lons)
-    lats = lats.T[::3,::3]
-    lons = lons.T[::3,::3]
-    idx = vals[::3,::3] > -8.0
+    lats = lats.T[::2,::2]
+    lons = lons.T[::2,::2]
+    idx = vals[::2,::2] > -8.0
     lats2 = lats[idx].ravel()
     lons2 = lons[idx].ravel()
-    vals2 = vals[::3,::3][idx].ravel()
+    vals2 = vals[::2,::2][idx].ravel()
     # Note you should only plot these scatter points on the first iteration and then just use them for clicking on the points
     trace1 = go.Scattermapbox(lat=lats2,
                               lon=lons2,
@@ -209,7 +209,7 @@ def update_graph(filename, slider_time, zoom_slider):
         'layout':
             go.Layout(autosize=True, hovermode='closest',
                       title='Average {} on {}'.format(filename.strip("CMG").strip("DEG").strip("Monthly"),time_str),
-                      barmode='stack', mapbox=mapbox, height=550, width=550,template= 'seaborn', font=dict(
+                      barmode='stack', mapbox=mapbox, height=650, width=750,template= 'seaborn', font=dict(
                 family="Courier New, monospace",
                 size=10,
             ))
@@ -268,7 +268,7 @@ def update_pre_callback(filename, foo_click_data,time_slider, key_name = key_nam
         'layout':
         go.Layout(
             title='{} Time-Series'.format(filename),#,"%.2f" % lats,"%.2f" % lons),
-            barmode='stack', width = 650, height =550,# colorway=["#5E0DAC", '#FF4F00', '#375CB1', '#FF7400', '#FFF400', '#FF0056'],
+            barmode='stack', width = 750, height =650,# colorway=["#5E0DAC", '#FF4F00', '#375CB1', '#FF7400', '#FFF400', '#FF0056'],
             template='seaborn',
             hovermode='x',
             autosize=True,
