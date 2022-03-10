@@ -13,7 +13,6 @@ import dash_html_components as html
 import plotly.graph_objs as go
 import pandas as pd
 import json
-from dask import delayed, compute
 import numpy as np
 import geojsoncontour
 
